@@ -1,17 +1,18 @@
 /**
  * Created by Alex on 07.05.2016.
  */
+
 import org.apache.commons.cli.*;
 
 public class ResolvePath {
 
     private String workingDir = System.getProperty("user.dir");
 
-    private String pathCsvFile = workingDir + "/url.csv";
+    private String pathCsvFile = workingDir + "/urls.csv";
 
-    private String pathCsvFileResp = pathCsvFile;
+    private String pathCsvFileResp = workingDir + "/result.csv";
 
-    private Integer countThreads = 20;
+    private Integer countThreads = Runtime.getRuntime().availableProcessors() * 10;
 
 
     public ResolvePath() {

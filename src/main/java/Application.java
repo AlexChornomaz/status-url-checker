@@ -9,10 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -51,17 +48,15 @@ public class Application {
     }
 
     private static Map<String, Integer> getResponseCode(List<String> urlList, Integer threads) throws IOException, InterruptedException {
-        final Map<String, Integer> response = new HashMap<String, Integer>(urlList.size());
+        final Map<String, Integer> response = Collections.synchronizedMap(new LinkedHashMap<>());
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
-        System.out.println("Created " + threads +" threads!");
+        System.out.println("Created " + threads + " threads!");
         for (final String url : urlList) {
-            executor.submit(new Runnable() {
-                public void run() {
-                    System.out.println("Start work with: " + url.toLowerCase() + " " + Thread.currentThread());
+            executor.submit(() -> {
+                System.out.println("Start work with: " + url.toLowerCase() + " " + Thread.currentThread());
 
-                    response.put(url, getStatusCode(url));
-                    System.out.println("Put result in response: " + url.toLowerCase() + " " + Thread.currentThread());
-                }
+                response.put(url, getStatusCode(url));
+                System.out.println("Put result in response: " + url.toLowerCase() + " " + Thread.currentThread());
             });
         }
         while (((ThreadPoolExecutor) executor).getActiveCount() > 0) {
@@ -99,12 +94,12 @@ public class Application {
     }
 
     private static List<String> getListUrl(String pathCsvFile) throws IOException {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         File csvFile = new File(pathCsvFile);
         CSVParser parser = CSVParser.parse(csvFile, Charset.defaultCharset(), CSVFormat.RFC4180);
         for (CSVRecord csvRecord : parser) {
             String url = csvRecord.iterator().next().split(";")[0];
-            if(url.startsWith("http")) {
+            if (url.startsWith("http")) {
                 list.add(url);
             }
         }
